@@ -46,6 +46,10 @@ class ServerStore {
             this._imgs = this._imgs.filter((img) => img.name !== image)
         }
     }
+
+    get info() {
+        return {storage: this._storage, files: this._imgs.length}
+    }
 }
 
 module.exports = new ServerStore()

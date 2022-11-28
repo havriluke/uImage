@@ -133,7 +133,7 @@ class UserController {
                 storage: images_.map((image) => image.storage).reduce((a, b) => a + b, 0),
                 images: images_.map((image) => {
                     return {
-                        url: image.url,
+                        url: process.env.URL + image.url,
                         name: image.name,
                         storage: image.storage,
                         mimeType: image.mimeType
@@ -176,7 +176,7 @@ class UserController {
                 storage: images_.map((image) => image.storage).reduce((a, b) => a + b, 0),
                 images: images_.map((image) => {
                     return {
-                        url: image.url,
+                        url: process.env.URL + image.url,
                         name: image.name,
                         storage: image.storage,
                         mimeType: image.mimeType

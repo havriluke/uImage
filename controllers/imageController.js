@@ -43,7 +43,7 @@ class ImageController {
 
         const imageModel = new Image({
             imgbbUrl: imgbbData.url,
-            url: process.env.URL + `image?img=${album.code}---${code}`,
+            url: `image?img=${album.code}---${code}`,
             name: imageName,
             storage: image.size / 1000000,
             albumId: album._id,
@@ -54,7 +54,7 @@ class ImageController {
 
         await User.updateOne({_id: user._id}, {storage: user.storage + image.size/1000000})
 
-        return res.status(200).json({ url: imageModel.url })
+        return res.status(200).json({ url: process.env.URL + imageModel.url })
     }
 
     async remove(req, res, next) {
@@ -77,8 +77,9 @@ class ImageController {
         }
 
         serverStore.deleteImage(image.code + '.' + image.mimeType.split('/')[1])
+        console.log('\nStatic RAM: ' + serverStore.info.storage + ' Mb\nFiles: ' + serverStore.info.files)
 
-        await User.updateOne({_id: user._id}, {storage: user.storage - image.size/1000000})
+        await User.updateOne({_id: user._id}, {storage: user.storage - image.storage})
 
         return res.status(200).json({message: `Image ${imageName} was successfully deleted from ${albumName}`})
     }
@@ -106,6 +107,7 @@ class ImageController {
         imageCode = imageCode + '.' + image.mimeType.split('/')[1]
 
         serverStore.uploadImage(imageCode, image.storage, url, () => {
+            console.log('\nStatic RAM: ' + serverStore.info.storage + ' Mb\nFiles: ' + serverStore.info.files)
             return res.redirect(`${process.env.URL}0/${imageCode}`)
         })
     }

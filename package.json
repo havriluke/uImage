@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "private": false,
-  "engines": {
-    "node": "^16.8.0"
-  },
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -16,12 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@dynatrace/oneagent": "^1.137.152-1.0.0",
-    "body-parser": "^1.17.x",
-    "cfenv": "^1.0.x",
-    "cloudant": "1.9.x",
-    "npm": "^6.4.1",
-    "semver": "^5.6.0",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",

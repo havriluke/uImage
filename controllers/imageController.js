@@ -63,8 +63,8 @@ class ImageController {
     async remove(req, res, next) {
         let imageName, albumName, user
         try {
-            imageName = req.body.imageName
-            albumName = req.body.albumName
+            imageName = req.query.imageName
+            albumName = req.query.albumName
             user = req.user
         } catch {
             return res.status(400).json({message: `Invalid request`})

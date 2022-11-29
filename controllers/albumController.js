@@ -27,7 +27,7 @@ class AlbumController {
     async delete(req, res, next) {
         let name, user
         try {
-            name = req.body.name
+            name = req.query.name
             user = req.user
         } catch {
             return res.status(400).json({message: `Invalid request`})

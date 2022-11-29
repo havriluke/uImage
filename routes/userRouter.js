@@ -11,7 +11,7 @@ router.get('/auth', authMiddleware, userController.check)
 router.put('/', authMiddleware, userController.edit)
 router.put('/api-key', authMiddleware, userController.editApiKey)
 router.get('/self-info', authMiddleware, userController.getSelfInfo)
-router.get('/info', authMiddleware, userController.getInfo)
+router.get('/info', userController.getInfo)
 
 router.put('/status', authMiddleware, checkAdminMiddleware, userController.editStatus)
 

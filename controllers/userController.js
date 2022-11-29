@@ -156,7 +156,7 @@ class UserController {
     async getInfo(req, res, next) {
         let username
         try {
-            username = req.body.username
+            username = req.query.username
         } catch {
             return res.status(400).json({message: 'Invalid request'})
         }

@@ -17,6 +17,9 @@ class ImageController {
             return res.status(400).json({url: '', message: `Invalid request`})
         }
 
+        if (image.size/1000000 >= parseInt(process.env.MAX_SIZE)) {
+            return res.status(400).json({url: '', message: `Max image size is ${process.env.MAX_SIZE}MB. Your image size is ${image.size/1000000}MB`})
+        }
         if (image.mimetype.split('/')[0] !== 'image') {
             return res.status(400).json({url: '', message: `This type is not allowed`})
         }
@@ -43,7 +46,7 @@ class ImageController {
 
         const imageModel = new Image({
             imgbbUrl: imgbbData.url,
-            url: `image?img=${album.code}---${code}`,
+            url: `image?img=${code}`,
             name: imageName,
             storage: image.size / 1000000,
             albumId: album._id,
@@ -77,7 +80,7 @@ class ImageController {
         }
 
         serverStore.deleteImage(image.code + '.' + image.mimeType.split('/')[1])
-        console.log('\nStatic RAM: ' + serverStore.info.storage + ' Mb\nFiles: ' + serverStore.info.files)
+        console.log('\nStatic RAM: ' + serverStore.info.storage + ' MB\nFiles: ' + serverStore.info.files)
 
         await User.updateOne({_id: user._id}, {storage: user.storage - image.storage})
 
@@ -85,19 +88,14 @@ class ImageController {
     }
 
     async get(req, res, next) {
-        let imageCode, albumCode
+        let imageCode
         try {
-            albumCode = req.query.img.split('---')[0]
-            imageCode = req.query.img.split('---')[1]
+            imageCode = req.query.img
         } catch {
             return res.redirect(`${process.env.URL}00default.jpg`)
         }
 
-        const album = await Album.findOne({code: albumCode})
-        if (!album) {
-            return res.redirect(`${process.env.URL}00default.jpg`)
-        }
-        const image = await Image.findOne({code: imageCode, albumId: album._id})
+        const image = await Image.findOne({code: imageCode})
         if (!image) {
             return res.redirect(`${process.env.URL}00default.jpg`)
         }
@@ -107,7 +105,7 @@ class ImageController {
         imageCode = imageCode + '.' + image.mimeType.split('/')[1]
 
         serverStore.uploadImage(imageCode, image.storage, url, () => {
-            console.log('\nStatic RAM: ' + serverStore.info.storage + ' Mb\nFiles: ' + serverStore.info.files)
+            console.log('\nStatic RAM: ' + serverStore.info.storage + ' MB\nFiles: ' + serverStore.info.files)
             return res.redirect(`${process.env.URL}0/${imageCode}`)
         })
     }

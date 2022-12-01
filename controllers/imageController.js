@@ -90,20 +90,18 @@ class ImageController {
     }
 
     async get(req, res, next) {
+        const dafaultPath = `${process.env.URL}00default.png`
         let imageCode
         try {
             imageCode = req.params.img
             imageCode = imageCode.split('.')[0]
         } catch {
-            return res.redirect(`${process.env.URL}00default.jpg`)
+            return res.redirect(dafaultPath)
         }
-
-        const files = fs.readdirSync('./static/0')
-        console.log(files)
 
         const image = await Image.findOne({code: imageCode})
         if (!image) {
-            return res.redirect(`${process.env.URL}00default.jpg`)
+            return res.redirect(dafaultPath)
         }
         const album = await Album.findOne({_id: image.albumId})
 
@@ -118,9 +116,9 @@ class ImageController {
             const hash = req.fingerprint.hash
             const user = await User.findOne({hash})
             if (!user) {
-                return res.redirect(`${process.env.URL}00default.jpg`)
+                return res.redirect(dafaultPath)
             } else if (!album.accessIds.includes(user._id)) {
-                return res.redirect(`${process.env.URL}00default.jpg`)
+                return res.redirect(dafaultPath)
             }
             const url = image.imgbbUrl
             imageCode = uuid.v4() + '.' + image.mimeType.split('/')[1]

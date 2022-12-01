@@ -157,7 +157,6 @@ class UserController {
             apiKey: user.apiKey,
             albums: albumsWithImages
         }
-
         return res.status(200).json(response)
     }
 

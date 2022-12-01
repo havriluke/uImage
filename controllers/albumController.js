@@ -53,7 +53,7 @@ class AlbumController {
         }
 
         const candidate = await Album.findOne({name: newName, userId: user._id})
-        if (!!candidate && name !== newName) {
+        if (!!candidate) {
             return res.status(400).json({message: `Album ${newName} has already exist`})
         }
         await Album.updateOne({userId: user._id, name}, {name: newName})

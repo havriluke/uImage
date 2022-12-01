@@ -1,6 +1,5 @@
 const https = require('https')
 const fs = require('fs')
-const path = require('path')
 
 class ServerStore {
 
@@ -13,7 +12,8 @@ class ServerStore {
     
 
     uploadImage(image, storage, url, redirectFunc) {
-        if (fs.existsSync(`./static/0/${image}`)) {
+        const pathToFile = `./static/0/${image}`
+        if (fs.existsSync(pathToFile)) {
             redirectFunc()
             return
         }
@@ -25,7 +25,7 @@ class ServerStore {
             this._imgs = this._imgs.filter((img, i) => i !== 0)
         }
 
-        const file = fs.createWriteStream(`./static/0/${image}`)
+        const file = fs.createWriteStream(pathToFile)
         https.get(url, (response) => {
             response.pipe(file)
             file.on("finish", () => {
@@ -33,10 +33,24 @@ class ServerStore {
                 this._storage += storage
                 file.close(redirectFunc)
             }).on('error', () => {
-                fs.unlink(file)
+                fs.unlinkSync(pathToFile)
             })
         })
 
+    }
+
+    uploadPrivateImage(image, url, redirectFunc) {
+        const pathToFile = `./static/0/secure/${image}`
+        const file = fs.createWriteStream(pathToFile)
+        https.get(url, (response) => {
+            response.pipe(file)
+            file.on("finish", () => {
+                file.close(redirectFunc)
+                setTimeout(() => fs.unlinkSync(pathToFile), 1000)
+            }).on('error', () => {
+                fs.unlinkSync(pathToFile)
+            })
+        })
     }
 
     deleteImage(image) {

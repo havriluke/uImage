@@ -18,7 +18,7 @@ class AlbumController {
         }
 
         const code = uuid.v4()
-        const album = new Album({name, code, isPrivate, userId: user._id})
+        const album = new Album({name, code, isPrivate, userId: user._id, accessIds: [user._id]})
         album.save()
 
         return res.status(200).json({message: `Album ${name} was successfully created`})
@@ -33,8 +33,9 @@ class AlbumController {
             return res.status(400).json({message: `Invalid request`})
         }
 
-        const album = await Album.findOne({userId: user._id, name})
-        
+        const album = await Album.findOne({userId: user._id})
+        await User.updateOne({_id: user._id}, {storage: user.storage - album.storage})
+
         await Image.deleteMany({albumId: album._id})
         await Album.deleteOne({_id: album._id})
 
@@ -59,6 +60,58 @@ class AlbumController {
         await Album.updateOne({userId: user._id, name}, {name: newName, isPrivate: newIsPrivate})
 
         return res.status(200).json({message: `Album ${name} was successfully updated`})
+    }
+
+    async addAccess(req, res, next) {
+        let user, albumName, username
+        try {
+            user = req.user
+            albumName = req.body.albumName
+            username = req.body.username
+        } catch {
+            return res.status(400).json({message: `Invalid request`})
+        }
+
+        const album = await Album.findOne({userId: user._id, name: albumName})
+        if (!album) {
+            return res.status(400).json({message: `Album does not exist`})
+        }
+        const userModel = await User.findOne({username})
+        if (!userModel) {
+            return res.status(400).json({message: `User ${username} does not exist`})
+        } else if (album.accessIds.includes(userModel._id)) {
+            return res.status(400).json({message: `User ${username} have already have access to ${albumName}`})
+        }
+
+        const accessIds = [...album.accessIds, userModel._id]
+        await Album.updateOne({_id: album._id}, {accessIds})
+        return res.status(200).json({message: `User ${username} have access to ${albumName} now`})
+    }
+
+    async removeAccess(req, res, next) {
+        let user, albumName, username
+        try {
+            user = req.user
+            albumName = req.body.albumName
+            username = req.body.username
+        } catch {
+            return res.status(400).json({message: `Invalid request`})
+        }
+
+        const album = await Album.findOne({userId: user._id, name: albumName})
+        if (!album) {
+            return res.status(400).json({message: `Album does not exist`})
+        }
+        const userModel = await User.findOne({username})
+        if (!userModel) {
+            return res.status(400).json({message: `User ${username} does not exist`})
+        } else if (!album.accessIds.includes(userModel._id) || userModel._id.equals(user._id)) {
+            return res.status(400).json({message: `You can not add user ${username} to ${albumName}`})
+        }
+
+        const accessIds = album.accessIds.filter((id) => !id.equals(userModel._id))
+        await Album.updateOne({_id: album._id}, {accessIds})
+        return res.status(200).json({message: `User ${username} have not access to ${albumName} now`})
     }
 
 }

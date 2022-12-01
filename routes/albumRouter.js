@@ -7,4 +7,7 @@ router.post('/', authMiddleware, albumController.create)
 router.delete('/', authMiddleware, albumController.delete)
 router.put('/', authMiddleware, albumController.edit)
 
+router.put('/access/add', authMiddleware, albumController.addAccess)
+router.put('/access/remove', authMiddleware, albumController.removeAccess)
+
 module.exports = router

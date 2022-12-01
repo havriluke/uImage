@@ -13,11 +13,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "base64-image-mime": "^1.0.2",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-fileupload": "^1.4.0",
+    "express-fingerprint": "^1.2.2",
     "express-handlebars": "^6.0.6",
     "imgbb-uploader": "^1.5.0",
     "jsonwebtoken": "^8.5.1",

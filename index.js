@@ -7,6 +7,7 @@ const cors = require('cors')
 const PORT = process.env.PORT || 5000
 const http = require('http')
 const path = require('path')
+const Fingerprint = require('express-fingerprint')
 
 const app = express()
 
@@ -14,6 +15,7 @@ app.use(cors({origin: true}))
 app.use(express.json())
 app.use(express.static(path.resolve(__dirname, 'static')))
 app.use(fileUpload({}))
+app.use(Fingerprint())
 app.use('/', router)
 
 const server = http.createServer(app)

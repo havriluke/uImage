@@ -6,7 +6,8 @@ const userSchema = new Schema({
     password: { type: String, required: true },
     status: { type: String, required: true },
     apiKey: { type: String, required: true },
-    storage: { type: Number, require: true}
+    storage: { type: Number, required: true},
+    hash: { type: String, required: true }
 }, {timestamps: true})
 
 
@@ -14,7 +15,8 @@ const albumSchema = new Schema({
     name: { type: String, required: true },
     code: { type: String, required: true },
     userId: { type: Object, required: true },
-    isPrivate: { type: Boolean, required: true }
+    isPrivate: { type: Boolean, required: true },
+    accessIds: { type: Array, required: true }
 }, {timestamps: true})
 
 

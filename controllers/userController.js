@@ -28,14 +28,19 @@ class UserController {
         if (password.trim().length < 8) {
             return res.status(400).json({message: 'Password must contain at least 8 characters'})
         }
-        const candidate = await User.findOne({username})
+        const hash = req.fingerprint.hash
+        let candidate = await User.findOne({hash})
+        if (!!candidate) {
+            return res.status(400).json({message: `You already have an account ${candidate.username}`})
+        }
+        candidate = await User.findOne({username})
         if (!!candidate) {
             return res.status(400).json({message: `User ${username} has already exist`})
         }
 
         const hashPassword = await bcrypt.hash(password, 5)
         const apiKey = uuid.v4()
-        const user = new User({username, password: hashPassword, status: 'BASIC', apiKey, storage: 0.0})
+        const user = new User({username, password: hashPassword, status: 'BASIC', apiKey, storage: 0.0, hash})
         await user.save()
         return res.json({apiKey})
     }
@@ -57,6 +62,8 @@ class UserController {
         if (!comparePassword) {
             return res.status(400).json({message: `Incorrect password`})
         }
+        const hash = req.fingerprint.hash
+        if (user.hash !== hash) await User.updateOne({_id: user._id}, {hash})
         const apiKey = user.apiKey
         return res.json({apiKey})
     }
@@ -127,10 +134,11 @@ class UserController {
         const images = await Image.find({albumId: {$in: albums.map((album) => album._id)}})
 
         const albumsWithImages = albums.map((album) => {
-            const images_ = images.filter((image) => album._id.equals(image.albumId))
+            const images_ = images.filter(async(image) => album._id.equals(image.albumId))
             return {
                 name: album.name,
                 storage: images_.map((image) => image.storage).reduce((a, b) => a + b, 0),
+                private: album.isPrivate,
                 images: images_.map((image) => {
                     return {
                         url: process.env.URL + image.url,

@@ -8,6 +8,6 @@ router.post('/', authMiddleware, imageController.add)
 router.delete('/', authMiddleware, imageController.remove)
 router.put('/', authMiddleware, imageController.rename)
 
-router.get('/image', imageController.get)
+router.get('/0/:img', imageController.get)
 
 module.exports = router

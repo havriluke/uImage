@@ -90,44 +90,44 @@ class ImageController {
     }
 
     async get(req, res, next) {
-        // let imageCode
-        // try {
-        //     imageCode = req.params.img
-        //     imageCode = imageCode.split('.')[0]
-        // } catch {
-        //     return res.redirect(`${process.env.URL}00default.jpg`)
-        // }
+        let imageCode
+        try {
+            imageCode = req.params.img
+            imageCode = imageCode.split('.')[0]
+        } catch {
+            return res.redirect(`${process.env.URL}00default.jpg`)
+        }
 
-        // const files = fs.readdirSync('./static/0')
-        // console.log(files)
+        const files = fs.readdirSync('./static/0')
+        console.log(files)
 
-        // const image = await Image.findOne({code: imageCode})
-        // if (!image) {
-        //     return res.redirect(`${process.env.URL}00default.jpg`)
-        // }
-        // const album = await Album.findOne({_id: image.albumId})
+        const image = await Image.findOne({code: imageCode})
+        if (!image) {
+            return res.redirect(`${process.env.URL}00default.jpg`)
+        }
+        const album = await Album.findOne({_id: image.albumId})
 
-        // if (!album.isPrivate) {
-        //     const url = image.imgbbUrl
-        //     imageCode = imageCode + '.' + image.mimeType.split('/')[1]
-        //     serverStore.uploadImage(imageCode, image.storage, url, () => {
-        //         console.log('\nStatic RAM: ' + serverStore.info.storage + ' MB\nFiles: ' + serverStore.info.files)
-        //         return res.redirect(`${process.env.URL}0/${imageCode}`)
-        //     })
-        // } else {
-        //     const hash = req.fingerprint.hash
-        //     const user = await User.findOne({hash})
-        //     if (!user) {
-        //         return res.redirect(`${process.env.URL}00default.jpg`)
-        //     } else if (!album.accessIds.includes(user._id)) {
-        //         return res.redirect(`${process.env.URL}00default.jpg`)
-        //     }
-        //     const url = image.imgbbUrl
-        //     imageCode = uuid.v4() + '.' + image.mimeType.split('/')[1]
-        //     serverStore.uploadPrivateImage(imageCode, url, () => {
-        //         return res.redirect(`${process.env.URL}0/secure/${imageCode}`)
-        //     })
-        // }
+        if (!album.isPrivate) {
+            const url = image.imgbbUrl
+            imageCode = imageCode + '.' + image.mimeType.split('/')[1]
+            serverStore.uploadImage(imageCode, image.storage, url, () => {
+                console.log('\nStatic RAM: ' + serverStore.info.storage + ' MB\nFiles: ' + serverStore.info.files)
+                return res.redirect(`${process.env.URL}0/${imageCode}`)
+            })
+        } else {
+            const hash = req.fingerprint.hash
+            const user = await User.findOne({hash})
+            if (!user) {
+                return res.redirect(`${process.env.URL}00default.jpg`)
+            } else if (!album.accessIds.includes(user._id)) {
+                return res.redirect(`${process.env.URL}00default.jpg`)
+            }
+            const url = image.imgbbUrl
+            imageCode = uuid.v4() + '.' + image.mimeType.split('/')[1]
+            serverStore.uploadPrivateImage(imageCode, url, () => {
+                return res.redirect(`${process.env.URL}0/secure/${imageCode}`)
+            })
+        }
         
     }
 

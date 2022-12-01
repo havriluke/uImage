@@ -134,7 +134,7 @@ class UserController {
         const images = await Image.find({albumId: {$in: albums.map((album) => album._id)}})
 
         const albumsWithImages = albums.map((album) => {
-            const images_ = images.filter(async(image) => album._id.equals(image.albumId))
+            const images_ = images.filter((image) => album._id.equals(image.albumId))
             return {
                 name: album.name,
                 storage: images_.map((image) => image.storage).reduce((a, b) => a + b, 0),

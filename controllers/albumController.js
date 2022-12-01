@@ -42,12 +42,11 @@ class AlbumController {
         return res.status(200).json({message: `Album ${name} was successfully deleted`})
     }
 
-    async edit(req, res, next) {
-        let name, newName, newIsPrivate, user
+    async rename(req, res, next) {
+        let name, newName, user
         try {
             name = req.body.name
             newName = req.body.newName
-            newIsPrivate = req.body.newIsPrivate
             user = req.user
         } catch {
             return res.status(400).json({message: `Invalid request`})
@@ -57,9 +56,9 @@ class AlbumController {
         if (!!candidate && name !== newName) {
             return res.status(400).json({message: `Album ${newName} has already exist`})
         }
-        await Album.updateOne({userId: user._id, name}, {name: newName, isPrivate: newIsPrivate})
+        await Album.updateOne({userId: user._id, name}, {name: newName})
 
-        return res.status(200).json({message: `Album ${name} was successfully updated`})
+        return res.status(200).json({message: `Album ${name} was successfully renamed`})
     }
 
     async addAccess(req, res, next) {

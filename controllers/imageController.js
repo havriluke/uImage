@@ -3,6 +3,7 @@ const imgbbUploader = require('imgbb-uploader')
 const { Album, Image, User } = require('../models')
 const uuid = require('uuid')
 const {statuses} = require('../utils')
+const fs = require('fs')
 const { getImageMime } = require('base64-image-mime')
 
 class ImageController {
@@ -96,6 +97,9 @@ class ImageController {
         } catch {
             return res.redirect(`${process.env.URL}00default.jpg`)
         }
+
+        const files = fs.readdirSync('./static/0')
+        console.log(files)
 
         const image = await Image.findOne({code: imageCode})
         if (!image) {

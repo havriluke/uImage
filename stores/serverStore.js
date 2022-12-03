@@ -1,5 +1,6 @@
 const https = require('https')
 const fs = require('fs')
+const request = require('request').defaults({ encoding: null })
 
 class ServerStore {
 
@@ -8,8 +9,6 @@ class ServerStore {
         this._storageLimit = 320
         this._imgs = []
     }
-
-    
 
     uploadImage(image, storage, url, redirectFunc) {
         const pathToFile = `./static/0/${image}`
@@ -25,31 +24,29 @@ class ServerStore {
             this._imgs = this._imgs.filter((img, i) => i !== 0)
         }
 
-        const file = fs.createWriteStream(pathToFile)
-        https.get(url, (response) => {
-            response.pipe(file)
-            file.on("finish", () => {
-                this._imgs.push({name: image, storage})
-                this._storage += storage
-                file.close(redirectFunc)
-            }).on('error', () => {
+        request.get(url, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                const base64string = Buffer.from(body).toString('base64')
+                fs.writeFileSync(pathToFile, base64string, 'base64')
+                redirectFunc()
+            } else {
                 fs.unlinkSync(pathToFile)
-            })
+                return
+            }
         })
-
+        this._imgs.push({name: image, storage})
+        this._storage += storage
     }
 
     uploadPrivateImage(image, url, redirectFunc) {
         const pathToFile = `./static/0/secure/${image}`
-        const file = fs.createWriteStream(pathToFile)
-        https.get(url, (response) => {
-            response.pipe(file)
-            file.on("finish", () => {
-                file.close(redirectFunc)
+        request.get(url, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                const base64string = Buffer.from(body).toString('base64')
+                fs.writeFileSync(pathToFile, base64string, 'base64')
+                redirectFunc()
                 setTimeout(() => fs.unlinkSync(pathToFile), 1000)
-            }).on('error', () => {
-                fs.unlinkSync(pathToFile)
-            })
+            }
         })
     }
 

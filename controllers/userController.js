@@ -71,8 +71,7 @@ class UserController {
     }
 
     async check(req, res, next) {
-        await User.updateOne({_id: req.user._id}, {hash: req.fingerprint.hash})
-        return res.json({apiKey: req.user.apiKey})
+        return res.json({expiration: req.user.hash !== req.fingerprint.hash})
     }
 
     async edit(req, res, next) {

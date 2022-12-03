@@ -63,15 +63,16 @@ class UserController {
             return res.status(400).json({message: `Incorrect password`})
         }
         const hash = req.fingerprint.hash
-        if (user.hash !== hash) await User.updateOne({_id: user._id}, {hash})
+        if (user.hash !== hash) {
+            await User.updateOne({_id: user._id}, {hash})
+        }
         const apiKey = user.apiKey
         return res.json({apiKey})
     }
 
     async check(req, res, next) {
-        const user = await User.findOne({id: req.user.id})
-        const apiKey = user.apiKey
-        return res.json({apiKey})
+        await User.updateOne({_id: req.user._id}, {hash: req.fingerprint.hash})
+        return res.json({apiKey: req.user.apiKey})
     }
 
     async edit(req, res, next) {
